@@ -1,0 +1,582 @@
+import tkinter as tk
+from tkinter import messagebox
+from PIL import Image, ImageTk
+from tkinter import PhotoImage
+import random
+
+QUESTIONS = 10
+ACHIEVED = 50
+MERIT = 70
+EXCELLENCE = 80
+
+
+Score = 0
+correct_answers = 0
+incorrect_answers = 0
+skipped_questions = 0
+question_number = 0
+answered = False
+
+
+# ---------- FUNCTIONS ----------
+def show_page(page):
+    page1.pack_forget()
+    page2.pack_forget()
+    page3.pack_forget()
+    
+    page.pack()
+    
+def load_question():
+    global question_number
+    global answered
+
+    answered = False
+
+    current_question = quiz_questions[question_number]
+
+    question_label.config(
+        text=f"QUESTION {question_number + 1}/10:\n\n{current_question['question']}"
+    )
+
+    if current_question["type"] == "tf":
+        option_button_1.config(text="True")
+        option_button_2.config(text="False")
+
+        option_button_3.config(text="")
+        option_button_4.config(text="")
+
+        option_button_3.config(state="disabled")
+        option_button_4.config(state="disabled")
+
+    else:
+        option_button_1.config(text=current_question["options"][0])
+        option_button_2.config(text=current_question["options"][1])
+        option_button_3.config(text=current_question["options"][2])
+        option_button_4.config(text=current_question["options"][3])
+
+        option_button_3.config(state="normal")
+        option_button_4.config(state="normal")
+
+def start_quiz():
+    global question_number
+    
+    question_number = 0
+    show_page(page2)
+    load_question()
+    
+def check_answer(selected_answer):
+    global Score
+    global correct_answers
+    global incorrect_answers
+    global answered
+
+    if answered:
+        return
+
+    answered = True
+
+    current_question = quiz_questions[question_number]
+
+    if selected_answer == current_question["answer"]:
+        Score += 10
+        correct_answers += 1
+        messagebox.showinfo("Correct!", "Well done!")
+    else:
+        incorrect_answers += 1
+        messagebox.showinfo(
+            "Incorrect",
+            f"The correct answer was:\n{current_question['answer']}"
+        )
+        
+def next_question():
+    global question_number
+
+    question_number += 1
+
+    if question_number < QUESTIONS:
+        load_question()
+    else:
+        show_results()
+        show_page(page3)
+        
+def show_results():
+    excellence_image.place_forget()
+    merit_image.place_forget()
+    achieved_image.place_forget()
+    not_achieved_image.place_forget()
+    
+    if Score >= EXCELLENCE:
+        results_text.config(text="YOU WIN!")
+        feedback_text.config(text="Excellent work! You really know your HTML/CSS.")
+        grade_text.config(text="EXCELLENCE")
+        excellence_image.place(x=140, y=50)
+
+    elif Score >= MERIT:
+        results_text.config(text="YOU WIN!")
+        feedback_text.config(text="Great job! You have a good understanding of HTML/CSS.")
+        grade_text.config(text="MERIT")
+        merit_image.place(x=140, y=50)
+
+    elif Score >= ACHIEVED:
+        results_text.config(text="YOU WIN!")
+        feedback_text.config(text="Good work! You achieved the required score.")
+        grade_text.config(text="ACHIEVED")
+        achieved_image.place(x=140, y=50)
+
+    else:
+        results_text.config(text="KEEP GOING!")
+        feedback_text.config(text="Keep practising and try again!")
+        grade_text.config(text="NOT ACHIEVED")
+        not_achieved_image.place(x=140, y=50)
+
+    score_text.config(text=f"SCORE: {Score}/100")
+    
+def play_again():
+    global Score
+    global correct_answers
+    global incorrect_answers
+    global skipped_questions
+    global question_number
+    global answered
+    global quiz_questions
+
+    Score = 0
+    correct_answers = 0
+    incorrect_answers = 0
+    skipped_questions = 0
+    question_number = 0
+    answered = False
+
+    quiz_questions = random.sample(questions, QUESTIONS)
+
+    show_page(page2)
+    load_question()
+
+    show_page(page2)
+    load_question()
+
+# ---------- MAIN ----------
+root = tk.Tk()
+root.title("Quiz")
+root.geometry("500x600+10+10")
+root.configure(bg="#fff9d6")
+
+questions = [
+    {"question":"What is the correct HTML element for inserting a line break?",
+     "options":[
+         "</b>",
+         "<break>",
+         "<br>",
+         "<newline>",
+     ],
+     "answer":"<br>",
+     "type":"mc"
+     },
+    
+    {"question":"Which character is used to indicate an end tag?",
+         "options":[
+             "^",
+             "<",
+             ">",
+             "*",
+         ],
+         "answer":">",
+         "type":"mc"
+         },
+    
+    {"question":"How can you make a numbered list?",
+             "options":[
+                 "<dl>",
+                 "<ol>",
+                 "<list>",
+                 "<nl>",
+             ],
+             "answer":"<ol>",
+             "type":"mc"
+             },
+    
+    {"question":"How can you make a bulleted list?",
+                 "options":[
+                     "<bl>",
+                     "<bullet>",
+                     "<list>",
+                     "<ul>",
+                 ],
+                 "answer":"<ul>",
+                 "type":"mc"
+                 },
+    
+    {"question":"What is the correct HTML element for inserting an image?",
+                     "options":[
+                         "<img src = 'image-utl.jpg' alt = 'description'>",
+                         "<img href = 'image-url.jpg' alt = 'description'>",
+                         "<image src = 'image-url.jpg' alt = 'description'>",
+                         "<img url = 'image-url.jpg' alt = 'description'>",
+                     ],
+                     "answer":"<img src = 'image-utl.jpg' alt = 'description'>",
+                     "type":"mc"
+                     },
+    
+    {"question":"HTML comments start with <!-- and end with -->",
+        "options":["True","False"],
+        "answer":"True",
+        "type":"tf"
+    },
+    
+    {"question":"Which HTML element defines the title of a document",
+                         "options":[
+                             "<header>",
+                             "<head>",
+                             "<heading>",
+                             "<meta name='title'>",
+                         ],
+                         "answer":"<head>",
+                         "type":"mc"
+                         },
+    
+    {"question":"What is the correct HTML for referring to an external style sheet?",
+                             "options":[
+                                 "<style src='mystyle.css'>",
+                                 "<link rel='stylesheet' src='mystyle.css'>",
+                                 "<stylesheet>mystyle.css</stylesheet>",
+                                 "<link rel = 'stylesheet' href = 'style.css'>",
+                             ],
+                             "answer":"<link rel = 'stylesheet' href = 'style.css'>",
+                             "type":"mc"
+                             },
+
+    {"question":"HTML stands for HyperText Markup Language",
+        "options":["True","False"],
+        "answer":"True",
+        "type":"tf"
+    },
+
+    {"question":"How do you insert a comment in a CSS file?",
+                             "options":[
+                                 "// this is a comment",
+                                 "' this is a comment",
+                                 "`` this is a comment",
+                                 "/* this is a comment */",
+                             ],
+                             "answer":"/* this is a comment */",
+                             "type":"mc"
+                             },
+
+    {"question":"Which CSS property is used to change the background colour?",
+                             "options":[
+                                 "bgcolor",
+                                 "background-style",
+                                 "background-color",
+                                 "color-background",
+                             ],
+                             "answer":"background-color",
+                             "type":"mc"
+                             },
+
+    {"question":"Which CSS property is used to change the text color of an element?",
+                             "options":[
+                                 "color",
+                                 "text-color",
+                                 "font-color",
+                                 "forecolor",
+                             ],
+                             "answer":"color",
+                             "type":"mc"
+                             },
+
+    {"question":"Which CSS property controls the text style?",
+                             "options":[
+                                 "font-size",
+                                 "font-format",
+                                 "text-type",
+                                 "font-style",
+                             ],
+                             "answer":"font-size",
+                             "type":"mc"
+                             },
+
+    {"question":"Which CSS property is used to change the font of an element?",
+                             "options":[
+                                 "font-format",
+                                 "text-type",
+                                 "font-style",
+                                 "font-family",
+                             ],
+                             "answer":"font-family",
+                             "type":"mc"
+                             },
+
+    {"question":"Which property is used to change the left margin of an element?",
+                             "options":[
+                                 "margin-left-side",
+                                 "padding-left",
+                                 "margin-left",
+                                 "indent-left",
+                             ],
+                             "answer":"margin-left",
+                             "type":"mc"
+                             },
+
+    {"question":"When using the padding property in CSS, you are allowed to use negative values.",
+        "options":["True","False"],
+        "answer":"False",
+        "type":"tf"
+    },
+
+    {"question":"Using CSS how do you select elements with class name ‘test’?",
+                             "options":[
+                                 "#test",
+                                 ".test{}",
+                                 "<test>",
+                                 "*test",
+                             ],
+                             "answer":".test{}",
+                             "type":"mc"
+                             },
+
+    {"question":"Using CSS how do you make an element take the full width and height of its parents?",
+                             "options":[
+                                 "size: parent;",
+                                 "width: full; height: full;",
+                                 "width: 100%; height: 100%",
+                                 "width: 100vh; height: 100vw;",
+                             ],
+                             "answer":"width: 100%; height: 100%",
+                             "type":"mc"
+                             },
+
+        {"question":"Which CSS property is used for text alignment?",
+                             "options":[
+                                 "align-text",
+                                 "text-position",
+                                 "text-align",
+                                 "horizontal-align",
+                             ],
+                             "answer":"text-align",
+                             "type":"mc"
+                             },
+]
+
+quiz_questions = random.sample(questions, QUESTIONS)
+
+
+page3 = tk.Frame(root, width=500, height=600, bg="white")
+page3.pack()
+page3.pack_propagate(True)
+
+page2 = tk.Frame(root, width=500, height=600, bg="white")
+page2.pack()
+page2.pack_propagate(True)
+
+page1 = tk.Frame(root, width=500, height=600, bg="white")
+page1.pack()
+page1.pack_propagate(True)
+
+show_page(page1)
+
+
+#PAGE 1 ---------------
+small_text = tk.Label(
+    page1, 
+    text = "YEAR 9",
+    borderwidth = 2, relief = "flat", bg="white",
+    font = "helvetica 12"          
+)
+small_text.place(x=110, y=90)
+
+title_text = tk.Label(
+    page1, 
+    text = "HTML/CSS QUIZ",
+    borderwidth = 2, relief = "flat", bg="white",
+    font = "helvetica 16 bold"          
+)
+title_text.place(x=110, y=115)
+
+subtitle_text = tk.Label(
+    page1, 
+    text = "Instructions: This quiz has 10 questions. \nSome are multiple-choice and some are \nTrue/False. Select the one best answer \nfor each question.\n\nEstimated completion time: 8 minutes",
+    borderwidth = 2, relief = "flat", bg="white", anchor="w", justify="left",
+    font = "helvetica 12"          
+)
+subtitle_text.place(x=110, y=150)
+
+pil_image = Image.open("html_css.png")
+resized_image = pil_image.resize((250, 150), Image.Resampling.LANCZOS)
+tk_image = ImageTk.PhotoImage(resized_image)
+html_css_image = tk.Label(page1, image=tk_image, borderwidth = 0)
+html_css_image.place(x=100, y=297)
+html_css_image.image = tk_image
+
+start_button = tk.Button(
+    page1, 
+    text="START",
+    height = "1", width = "14",
+    borderwidth = 2, relief = "flat",
+    fg = "black", bg = "#bbc3ba", activebackground="#a6ada5",
+    font = "helvetica 14 bold", pady = 4, 
+    command=lambda: start_quiz()         
+)
+start_button.place(x=150, y=475)
+
+#PAGE 2 ---------------
+question_border = tk.Label(
+    page2, 
+    text = "", relief = "flat", bg="#49a7eb", width = 180, height = 12
+)
+question_border.place(x=0, y=0)
+
+question_label = tk.Label(
+    page2,
+    text="QUESTION 1:",
+    borderwidth=2,
+    relief="flat",
+    bg="#49a7eb",
+    font="helvetica 17 bold",
+    fg="white",
+    wraplength=400,
+    justify="center"
+)
+question_label.place(x=50, y=35, width=400)
+
+option_button_1 = tk.Button(
+    page2, 
+    text="Option 1",
+    height = "1", width = "35",
+    borderwidth = 2, relief = "flat",
+    fg = "black", bg = "#e6eaed", activebackground="#c8d6e0",
+    font = "helvetica 12 bold", pady=10, command=lambda: check_answer(option_button_1["text"])   
+)
+option_button_1.place(x=70, y=225)
+
+option_button_2 = tk.Button(
+    page2, 
+    text="Option 2",
+    height = "1", width = "35",
+    borderwidth = 2, relief = "flat",
+    fg = "black", bg = "#e6eaed", activebackground="#c8d6e0",
+    font = "helvetica 12 bold", pady=10, command=lambda: check_answer(option_button_2["text"])        
+)
+option_button_2.place(x=70, y=287)
+
+option_button_3 = tk.Button(
+    page2, 
+    text="Option 3",
+    height = "1", width = "35",
+    borderwidth = 2, relief = "flat",
+    fg = "black", bg = "#e6eaed", activebackground="#c8d6e0",
+    font = "helvetica 12 bold", pady=10, command=lambda: check_answer(option_button_3["text"])   
+)
+option_button_3.place(x=70, y=349)
+
+option_button_4 = tk.Button(
+    page2, 
+    text="Option 4",
+    height = "1", width = "35",
+    borderwidth = 2, relief = "flat",
+    fg = "black", bg = "#e6eaed", activebackground="#c8d6e0",
+    font = "helvetica 12 bold", pady=10, command=lambda: check_answer(option_button_4["text"])     
+)
+option_button_4.place(x=70, y=411)
+
+quit_button = tk.Button(
+    page2, 
+    text="QUIT",
+    height = "1", width = "13",
+    borderwidth = 2, relief = "flat",
+    fg = "white", bg = "#49a7eb", activebackground="#218bd9", activeforeground= "white",
+    font = "helvetica 13 bold", pady=10, command=root.destroy,        
+)
+quit_button.place(x=70, y=490)
+
+next_button = tk.Button(
+    page2, 
+    text="NEXT",
+    height = "1", width = "13",
+    borderwidth = 2, relief = "flat",
+    fg = "white", bg = "#49a7eb", activebackground="#218bd9", activeforeground= "white",
+    font = "helvetica 13 bold", pady=10, command=next_question,      
+)
+next_button.place(x=290, y=490)
+
+#PAGE 3 ---------------
+pil_image1 = Image.open("not_achieved_face.png")
+resized_image1 = pil_image1.resize((200, 190), Image.Resampling.LANCZOS)
+tk_image1 = ImageTk.PhotoImage(resized_image1)
+not_achieved_image = tk.Label(page3, image=tk_image1, borderwidth = 0)
+not_achieved_image.image = tk_image1
+
+pil_image2 = Image.open("achieved_face.png")
+resized_image2 = pil_image2.resize((200, 190), Image.Resampling.LANCZOS)
+tk_image2 = ImageTk.PhotoImage(resized_image2)
+achieved_image = tk.Label(page3, image=tk_image2, borderwidth = 0)
+achieved_image.image = tk_image2
+
+pil_image3 = Image.open("merit_emoji.png")
+resized_image3 = pil_image3.resize((200, 190), Image.Resampling.LANCZOS)
+tk_image3 = ImageTk.PhotoImage(resized_image3)
+merit_image = tk.Label(page3, image=tk_image3, borderwidth = 0)
+merit_image.image = tk_image3
+
+pil_image4 = Image.open("excellence_emoji.png")
+resized_image4 = pil_image4.resize((200, 190), Image.Resampling.LANCZOS)
+tk_image4 = ImageTk.PhotoImage(resized_image4)
+excellence_image = tk.Label(page3, image=tk_image4, borderwidth = 0)
+excellence_image.image = tk_image4
+
+
+
+results_text = tk.Label(
+    page3, 
+    text = "keep going",
+    borderwidth = 2, relief = "flat", bg="white",
+    font = "helvetica 11 bold"         
+)
+results_text.place(x=190, y=390)
+
+feedback_text = tk.Label(
+    page3, 
+    text = "small feedback",
+    borderwidth = 2, relief = "flat", bg="white", anchor="w", justify="left",
+    font = "helvetica 12"         
+)
+feedback_text.place(x=140, y=415)
+
+grade_text = tk.Label(
+    page3, 
+    text = "ACHIEVED/EXCELLENCE/MERIT",
+    borderwidth = 2, relief = "flat", bg="white", anchor="w", justify="left",
+    font = "helvetica 14 bold"        
+)
+grade_text.place(x=180, y=310)
+
+score_text = tk.Label(
+    page3, 
+    text = "SCORE: #/10",
+    borderwidth = 2, relief = "flat", bg="white", anchor="w", justify="left",
+    font = "helvetica 13"        
+)
+score_text.place(x=180, y=280)
+
+quit_game_button = tk.Button(
+    page3, 
+    text="QUIT",
+    height = "1", width = "12",
+    borderwidth = 2, relief = "flat",
+    fg = "white", bg = "#49a7eb", activebackground="#218bd9", activeforeground= "white",
+    font = "helvetica 13 bold", pady=10, command=root.destroy,      
+)
+quit_game_button.place(x=70, y=490)
+
+play_again_button = tk.Button(
+    page3, 
+    text="PLAY AGAIN",
+    height = "1", width = "12",
+    borderwidth = 2, relief = "flat",
+    fg = "white", bg = "#49a7eb", activebackground="#218bd9", activeforeground= "white",
+    font = "helvetica 13 bold", pady=10, command=play_again,       
+)
+play_again_button.place(x=290, y=490)
+
+show_page(page1)
+
+root.mainloop()
