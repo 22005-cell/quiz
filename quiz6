@@ -15,6 +15,7 @@ correct_answers = 0
 incorrect_answers = 0
 skipped_questions = 0
 question_number = 0
+skips_remaining = 2
 answered = False
 
 
@@ -131,6 +132,17 @@ def show_results():
 
     score_text.config(text=f"SCORE: {Score}/100")
     
+def skip_question():
+    global skips_remaining
+    global skipped_questions
+
+    if skips_remaining > 0:
+        skips_remaining -= 1
+        skipped_questions += 1
+        next_question()
+    else:
+        messagebox.showinfo("No More Skips", "You have no more skips available.")
+    
 def play_again():
     global Score
     global correct_answers
@@ -145,6 +157,7 @@ def play_again():
     incorrect_answers = 0
     skipped_questions = 0
     question_number = 0
+    skips_remaining = 2
     answered = False
 
     quiz_questions = random.sample(questions, QUESTIONS)
@@ -481,22 +494,32 @@ option_button_4.place(x=70, y=411)
 quit_button = tk.Button(
     page2, 
     text="QUIT",
-    height = "1", width = "13",
+    height = "1", width = "7",
     borderwidth = 2, relief = "flat",
-    fg = "white", bg = "#49a7eb", activebackground="#218bd9", activeforeground= "white",
+    fg = "white", bg = "#cb3f3f", activebackground="#861d1d", activeforeground= "white",
     font = "helvetica 13 bold", pady=10, command=root.destroy,        
 )
 quit_button.place(x=70, y=490)
 
+skip_button = tk.Button(
+    page2, 
+    text="SKIP",
+    height = "1", width = "7",
+    borderwidth = 2, relief = "flat",
+    fg = "black", bg = "#bbc3ba", activebackground="#a6ada5",
+    font = "helvetica 13 bold", pady=10, command=skip_question,      
+)
+skip_button.place(x=160, y=490)
+
 next_button = tk.Button(
     page2, 
     text="NEXT",
-    height = "1", width = "13",
+    height = "1", width = "12",
     borderwidth = 2, relief = "flat",
     fg = "white", bg = "#49a7eb", activebackground="#218bd9", activeforeground= "white",
     font = "helvetica 13 bold", pady=10, command=next_question,      
 )
-next_button.place(x=290, y=490)
+next_button.place(x=300, y=490)
 
 #PAGE 3 ---------------
 pil_image1 = Image.open("not_achieved_face.png")
@@ -527,19 +550,22 @@ excellence_image.image = tk_image4
 
 results_text = tk.Label(
     page3, 
-    text = "keep going",
-    borderwidth = 2, relief = "flat", bg="white",
-    font = "helvetica 11 bold"         
+    text="keep going",
+    borderwidth=2, relief="flat", bg="white",
+    font="helvetica 11 bold"
 )
-results_text.place(x=190, y=390)
+results_text.place(relx=0.5, y=390, anchor="n")
+
 
 feedback_text = tk.Label(
     page3, 
-    text = "small feedback",
-    borderwidth = 2, relief = "flat", bg="white", anchor="w", justify="left",
-    font = "helvetica 12"         
+    text="small feedback",
+    borderwidth=2, relief="flat", bg="white",
+    anchor="center",
+    justify="center",
+    font="helvetica 12"
 )
-feedback_text.place(x=140, y=415)
+feedback_text.place(relx=0.5, y=415, anchor="n")
 
 grade_text = tk.Label(
     page3, 
@@ -560,12 +586,14 @@ score_text.place(x=180, y=280)
 quit_game_button = tk.Button(
     page3, 
     text="QUIT",
-    height = "1", width = "12",
+    height = "1", width = "7",
     borderwidth = 2, relief = "flat",
-    fg = "white", bg = "#49a7eb", activebackground="#218bd9", activeforeground= "white",
+    fg = "black", bg = "#bbc3ba", activebackground="#a6ada5",
     font = "helvetica 13 bold", pady=10, command=root.destroy,      
 )
 quit_game_button.place(x=70, y=490)
+
+
 
 play_again_button = tk.Button(
     page3, 
